@@ -16,20 +16,20 @@ $ go get github.com/koron-go/atermsearch@latest
 
 Example
 
-```
+```go
 package main
 
 import (
     "context"
     "fmt"
 
-	"github.com/koron-go/atermsearch"
+    "github.com/koron-go/atermsearch"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-	dev, err := atermsearch.Search(ctx, "192.168.0.123")
+    ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+    defer cancel()
+    dev, err := atermsearch.Search(ctx, "192.168.0.123")
     if err != nil {
         log.Fatal(err)
     }
