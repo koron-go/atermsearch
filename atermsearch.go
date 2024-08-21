@@ -62,7 +62,7 @@ func getParam(ctx context.Context, addr string, reqID string, wantName string) (
 	}
 	if resp.StatusCode != 200 {
 		resp.Body.Close()
-		return "", fmt.Errorf("the request to %s for addr %s returns %d, expected 200", u, addr, resp.StatusCode)
+		return "", fmt.Errorf("failed to HTTP request with status %d", resp.StatusCode)
 	}
 	b, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
