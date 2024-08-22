@@ -5,6 +5,7 @@ package atermsearch
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -58,11 +59,14 @@ func getParam(ctx context.Context, addr string, reqID string, wantName string) (
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
+		if cause := errors.Unwrap(err); cause != nil {
+			err = fmt.Errorf("failed to HTTP request to %s with: %w", addr, cause)
+		}
 		return "", err
 	}
 	if resp.StatusCode != 200 {
 		resp.Body.Close()
-		return "", fmt.Errorf("the request to %s for addr %s returns %d, expected 200", u, addr, resp.StatusCode)
+		return "", fmt.Errorf("failed to HTTP request to %s with status %d", addr, resp.StatusCode)
 	}
 	b, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
@@ -71,7 +75,7 @@ func getParam(ctx context.Context, addr string, reqID string, wantName string) (
 	}
 	r := strings.SplitN(string(b), "=", 2)
 	if r[0] != wantName {
-		return "", fmt.Errorf("unexpected param name, want %q: got body %q", wantName, string(b))
+		return "", fmt.Errorf("unexpected param name from %s: want=%q got=%q", addr, wantName, r[0])
 	}
 	return strings.TrimSpace(r[1]), nil
 }
